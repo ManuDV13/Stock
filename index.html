@@ -5,12 +5,23 @@
 <title>Reporte de Stock y Reposición — ERA Operaciones</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{
+:root, [data-theme="dark"]{
   --bg:#12181c; --panel:#1a2228; --panel2:#212b32; --line:#2c3941;
   --text:#e7ecee; --muted:#8ba0aa; --accent:#ff9d3d; --accent-dim:#7a5330;
   --ok:#4fbf8b; --warn:#e8b64c; --bad:#e8654c;
   --mono:'JetBrains Mono','Consolas',monospace; --sans:'Inter',-apple-system,'Segoe UI',sans-serif;
 }
+[data-theme="pink"]{
+  --bg:#fdf1f6; --panel:#ffffff; --panel2:#fce8f1; --line:#f3cfe1;
+  --text:#4a1030; --muted:#a56487; --accent:#e0447e; --accent-dim:#f6c9dd;
+  --ok:#2fa876; --warn:#d99a1f; --bad:#d43a63;
+}
+[data-theme="light"]{
+  --bg:#f4f6f7; --panel:#ffffff; --panel2:#eef1f2; --line:#dde3e6;
+  --text:#1c2a30; --muted:#6b7d85; --accent:#c76a1f; --accent-dim:#f2ddc4;
+  --ok:#1f8f60; --warn:#b8860b; --bad:#c23c3c;
+}
+body{transition:background .15s, color .15s;}
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;}
 .wrap{max-width:1160px;margin:0 auto;padding:18px 16px 60px;}
@@ -113,6 +124,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;margin-top:24px;}
     Movimientos: jun-2013 a jun-2026 &middot; Stock al 06-07-2026 &middot; Planificación al 06-07-2026<br>
     <b>Stock especial "Q" (proyectos) excluido</b>
   </div>
+  <button id="themeBtn" title="Cambiar tema" style="background:none;border:none;cursor:pointer;font-size:22px;line-height:1;padding:4px;">🖤</button>
 </header>
 
 <div class="tabnav">
@@ -206,6 +218,25 @@ const MRP_SUGGESTIONS = [{"material": "2002652", "texto": "TDM - TEGNOLOGIA DE D
 
 </script>
 <script>
+const THEMES = ['dark','pink','light'];
+const THEME_ICON = {dark:'🖤', pink:'💗', light:'🤍'};
+const THEME_LABEL = {dark:'Oscuro', pink:'Rosado', light:'Claro'};
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = THEME_ICON[t];
+  btn.title = 'Tema: ' + THEME_LABEL[t] + ' (clic para cambiar)';
+  try{ localStorage.setItem('era_stock_theme', t); }catch(e){}
+}
+let savedTheme = 'dark';
+try{ savedTheme = localStorage.getItem('era_stock_theme') || 'dark'; }catch(e){}
+applyTheme(savedTheme);
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = THEMES[(THEMES.indexOf(cur)+1) % THEMES.length];
+  applyTheme(next);
+});
+
 const ALL = '__ALL__';
 const CATS = ['Catalizadores','Aditivos y químicos','Ropa de trabajo y EPP','Materiales generales','Repuestos','Sin categoría'];
 let currentGrupo = ALL;
